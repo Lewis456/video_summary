@@ -47,7 +47,8 @@
 - 需要用到阿里云OSS、阿里云智能音频系统相关，新用户三个月试用，每天2h！！！
 
 ## 结果展示
-
+![result1](https://github.com/Lewis456/video_summary/blob/main/image/%E7%BB%93%E6%9E%9C3.png?raw=true)
+![result2](https://github.com/Lewis456/video_summary/blob/main/image/%E7%BB%93%E6%9E%9C4.png?raw=true)
 
 ## 许可证
 
