@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>智能视频总结系统</title>
+    <style>
+        body { font-family: "Segoe UI", Arial, sans-serif; margin: 0; background: #f4f6f8; color: #333; }
+        header { background: #3498db; color: #fff; padding: 20px; text-align: center; font-size: 24px; font-weight: bold; }
+        main { max-width: 900px; margin: 30px auto; padding: 20px; }
+        .card { background: #fff; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h2 { margin-top: 0; color: #2c3e50; }
+        input[type="file"] { padding: 10px; border: 2px dashed #3498db; border-radius: 8px; cursor: pointer; background: #f9fbff; width: 100%; }
+        button { margin-top: 15px; padding: 12px 20px; border: none; border-radius: 8px; background: #3498db; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; }
+        button:hover { background: #2980b9; }
+        textarea { width: 100%; height: 200px; margin-top: 10px; padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-family: monospace; resize: vertical; background: #fafafa; }
+        .status p { margin: 6px 0; }
+    </style>
+</head>
+<body>
+    <header>🎥 智能视频总结系统</header>
+    <main>
+        <div class="card">
+            <h2>上传视频</h2>
+            <form id="uploadForm" action="/upload_video/" method="post" enctype="multipart/form-data">
+                <input type="file" name="file" accept="video/*" required>
+                <button type="submit">上传并生成总结</button>
+            </form>
+        </div>
+
+        <div class="card status" id="statusBox" style="display:none;">
+            <h2>处理状态</h2>
+            <div id="statusMessages"></div>
+        </div>
+
+        <div class="card" id="transcriptBox" style="display:none;">
+            <h2>转写文本</h2>
+            <textarea id="transcriptArea" readonly></textarea>
+        </div>
+
+        <div class="card" id="summaryBox" style="display:none;">
+            <h2>视频总结</h2>
+            <textarea id="summaryArea" readonly></textarea>
+        </div>
+    </main>
+
+    <script>
+        const form = document.getElementById("uploadForm");
+        const statusBox = document.getElementById("statusBox");
+        const statusMessages = document.getElementById("statusMessages");
+        const transcriptBox = document.getElementById("transcriptBox");
+        const transcriptArea = document.getElementById("transcriptArea");
+        const summaryBox = document.getElementById("summaryBox");
+        const summaryArea = document.getElementById("summaryArea");
+
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            statusBox.style.display = "block";
+            statusMessages.innerHTML = "<p>🚀 开始上传...</p>";
+
+            const formData = new FormData(form);
+            fetch("/upload_video/", { method: "POST", body: formData })
+                .then(res => res.json())
+                .then(data => {
+                    const task_id = data.task_id;
+                    const eventSource = new EventSource(`/progress/${task_id}`);
+
+                    eventSource.onmessage = function(event) {
+                        const msg = JSON.parse(event.data);
+
+                        if (msg.type === "status") {
+                            const p = document.createElement("p");
+                            p.textContent = (msg.success ? "✅ " : "❌ ") + msg.step;
+                            statusMessages.appendChild(p);
+                        }
+
+                        if (msg.type === "transcript") {
+                            transcriptBox.style.display = "block";
+                            transcriptArea.value += msg.text + "\n";
+                        }
+
+                        if (msg.type === "summary") {
+                            summaryBox.style.display = "block";
+                            summaryArea.value += msg.text;
+                        }
+
+                        if (msg.done) {
+                            eventSource.close();
+                        }
+                    };
+                });
+        });
+    </script>
+</body>
+</html>
