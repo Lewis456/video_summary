@@ -1,0 +1,9 @@
+uvicorn
+fastapi
+sqlalchemy
+pymysql
+python-jose[cryptography]
+passlib[bcrypt]
+python-dotenv
+oss2
+ffmpeg-python
