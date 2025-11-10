@@ -1,63 +1,149 @@
-# 视频智能摘要系统
+# 智能视频总结系统后端
 
-这是一个基于Web的视频智能摘要系统，可实现视频上传、音频提取、语音识别和AI摘要生成的完整流程。
-B站配置阿里云KEY教程:https://b23.tv/QAiOLZ1
-## 功能特性
+一个基于 FastAPI 的智能视频总结系统，支持视频上传、语音转写和AI文本总结功能。
 
-- 🎥 视频上传与处理
-- 🔊 视频转音频
-- 📄 音频文本识别
-- 🧠 使用AI生成文本摘要
-- 📊 实时处理进度显示
-- 🥳 未来实现:
-- 接入MySQL等
-- 增加登录，注册，支付等模块
-- 优化现有UI，实现完整项目
+## 系统功能
 
-## 系统架构
+### 用户认证
+- 用户注册（邮箱验证码）
+- 用户登录（JWT认证）
+- 找回密码（邮箱验证码）
 
-```
-├── app.py          # FastAPI后端服务
-├── main.py         # 主处理流程
-├── recognize.py    # 语音识别接口
-├── summarize_qwen.py # AI摘要生成模块
-└── templates/
-    └── index.html  # 前端界面
-```
+### 用户管理
+- 用户资料管理（头像、性别、生日等）
+- 会员类型管理（普通用户/VIP用户）
 
-## 使用方法
-
-1. 启动服务后访问Web界面
-2. 上传视频文件
-3. 系统自动进行以下处理：
-   - 提取视频音频
-   - 将音频转为文本
-   - 使用AI生成摘要
-4. 查看处理进度和最终摘要结果
+### 视频总结
+- 视频文件上传（支持 mp4、mov、avi、mkv、webm 格式）
+- 视频转音频（自动转换为 mp3）
+- 语音转文字（基于阿里云智能语音识别）
+- AI文本总结（基于通义千问大模型）
+- 异步任务处理（支持任务状态查询和取消）
+- 结果导出（Markdown格式）
 
 ## 技术栈
 
-- FastAPI: 后端API服务
-- HTML/CSS: 前端界面
-- 阿里云语音识别: 音频转文本
-- Qwen: AI摘要生成
+- **Web框架**: FastAPI
+- **数据库**: MySQL + SQLAlchemy ORM
+- **认证**: JWT (JSON Web Token)
+- **语音识别**: 阿里云智能语音识别
+- **AI总结**: 通义千问 (DashScope)
+- **文件存储**: 阿里云OSS
+- **视频转码**: ffmpeg-python
+
+## 安装依赖
+
+```bash
+pip install -r app/requirements.txt
+```
+
+## 环境配置
+
+### 1. 复制环境变量文件
+
+```bash
+cp .env.example .env
+```
+
+### 2. 编辑 `.env` 文件
+
+配置以下环境变量：
+
+```env
+# 数据库配置
+DATABASE_URL=mysql+pymysql://用户名:密码@主机:端口/数据库名
+SECRET_KEY=your-secret-key-here
+
+# SMTP邮件配置（用于发送验证码）
+SMTP_HOST=smtp.example.com
+SMTP_PORT=465
+SMTP_USER=no-reply@example.com
+SMTP_PASSWORD=your-smtp-password
+SMTP_FROM=no-reply@example.com
+SMTP_USE_SSL=true
+SMTP_STARTTLS=false
+
+# 阿里云语音识别配置
+ALIYUN_AK_ID=your-access-key-id
+ALIYUN_AK_SECRET=your-access-key-secret
+ALIYUN_APP_KEY=your-app-key
+
+# 通义千问API配置
+DASHSCOPE_API_KEY=your-dashscope-api-key
+
+# 阿里云OSS配置（用于文件存储）
+OSS_ENDPOINT=https://oss-cn-shanghai.aliyuncs.com
+OSS_BUCKET=your-bucket-name
+OSS_PUBLIC_DOMAIN=https://your-bucket.oss-cn-shanghai.aliyuncs.com
+```
+
+### 3. 创建数据库
+
+```sql
+CREATE DATABASE video_sum_db;
+```
+
+## 初始化数据库
+
+```bash
+python init_db.py
+```
+
+## 启动服务
+
+### 开发模式（自动重载）
+
+```bash
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+### 生产模式
+
+```bash
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
+## API访问
+
+- **服务地址**: http://127.0.0.1:8000
+- **API文档 (Swagger)**: http://127.0.0.1:8000/docs
+- **API文档 (ReDoc)**: http://127.0.0.1:8000/redoc
+
+## API接口说明
+
+### 认证接口 (`/api/auth`)
+- `POST /api/auth/register` - 用户注册
+- `POST /api/auth/login` - 用户登录
+- `POST /api/auth/send-code` - 发送邮箱验证码
+- `POST /api/auth/reset-password` - 重置密码
+
+### 用户接口 (`/api/user`)
+- `GET /api/user/profile` - 获取用户资料
+- `PUT /api/user/profile` - 更新用户资料
+- `POST /api/user/avatar` - 上传头像
+
+### 视频总结接口 (`/api/summary`)
+- `POST /api/summary/start` - 提交视频总结任务（上传视频文件）
+- `GET /api/summary/status` - 查询任务状态
+- `POST /api/summary/cancel` - 取消任务
+
+## 使用流程
+
+1. **用户注册/登录**: 通过邮箱注册账号并登录系统
+2. **上传视频**: 在生成页面选择并上传视频文件（支持拖拽上传）
+3. **等待处理**: 系统自动进行视频转码、语音识别和文本总结
+4. **查看结果**: 查看转写文本和AI生成的总结
+5. **导出结果**: 将总结结果导出为Markdown文件
 
 ## 注意事项
 
-- 系统需要配置阿里云语音识别的API密钥
-- 需要安装FFmpeg进行视频音频处理
-- AI摘要功能需要连接Qwen服务
-- 一定一定要将相关API KEY配置到本地环境，具体可以上网搜索教程！！
-- 需要用到阿里云OSS、阿里云智能音频系统相关，新用户三个月试用，每天2h！！！
+- 视频文件会自动转换为mp3格式并上传到OSS
+- 任务处理为异步执行，可通过任务ID查询进度
+- 支持任务取消功能（最佳努力取消）
+- 所有文件存储在阿里云OSS，请确保OSS配置正确
 
-## 结果展示
-![result1](https://github.com/Lewis456/video_summary/blob/main/image/%E7%BB%93%E6%9E%9C3.png?raw=true)
-![result2](https://github.com/Lewis456/video_summary/blob/main/image/%E7%BB%93%E6%9E%9C4.png?raw=true)
+## 开发说明
 
-## 许可证
-
-未在代码库中找到明确的许可证信息。请在使用前联系作者确认许可证类型。
-
-## 贡献指南
-
-未在代码库中找到具体的贡献指南信息。请查看项目文档或联系作者获取贡献方式。
+- 任务状态存储在内存中（开发环境），生产环境建议使用Redis或数据库
+- 支持CORS跨域请求
+- 使用JWT进行用户认证，Token通过Header传递
