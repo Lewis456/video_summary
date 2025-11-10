@@ -2,6 +2,26 @@
 
 一个基于 FastAPI 的智能视频总结系统，支持视频上传、语音转写和AI文本总结功能。
 
+## 项目结构
+
+```
+video-sum/
+├── backend/                 # 后端服务
+│   ├── app/
+│   │   ├── api/          # API路由层
+│   │   ├── core/         # 核心配置（数据库、配置）
+│   │   ├── models/       # 数据模型
+│   │   ├── services/     # 业务服务层
+│   │   └── main.py       # 应用入口
+│   └── init_db.py        # 数据库初始化
+└── frontend/             # 前端应用
+    ├── src/
+    │   ├── views/        # 页面组件
+    │   ├── router/      # 路由配置
+    │   └── main.js      # 应用入口
+    └── package.json     # 依赖配置
+```
+
 ## 系统功能
 
 ### 用户认证
