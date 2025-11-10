@@ -48,7 +48,7 @@ cp .env.example .env
 ### 2. 编辑 `.env` 文件
 
 配置以下环境变量：
-
+位于backend文件夹下!
 ```env
 # 数据库配置
 DATABASE_URL=mysql+pymysql://用户名:密码@主机:端口/数据库名
