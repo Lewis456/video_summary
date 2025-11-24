@@ -1,6 +1,9 @@
 # 智能视频总结系统
 
-一个基于 FastAPI 的前后端隔离的智能视频总结系统，支持视频上传、语音转写和AI文本总结功能。配置密钥教程：https://www.bilibili.com/video/BV1oApiziEn7/ 这是1.0版本的需要配置到环境变量，现在可以按下面的格式创建.env文件，将密钥粘贴进去即可。演示视频：https://www.bilibili.com/video/BV1ceCFBGECf/
+一个基于 FastAPI 的前后端隔离的智能视频总结系统，支持视频上传、语音转写和AI文本总结功能。  
+前端使用Vue3，后端使用Python，前端部分被我用.gitattributes屏蔽了，所以库里面语言没展示VUE，对实际代码没有影响  
+配置密钥教程：https://www.bilibili.com/video/BV1oApiziEn7/ 这是1.0版本的需要配置到环境变量，现在可以按下面的格式创建.env文件，将密钥粘贴进去即可。演示视频：https://www.bilibili.com/video/BV1ceCFBGECf/  
+
 
 ## 项目结构
 
